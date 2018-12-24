@@ -3,8 +3,8 @@
 * Ubuntu16.06
 * Core i5
 * Geforece GTX 1060 6GB
-* CUDA 
-* Cudnn
+* CUDA 8.0
+* Cudnn 6.0
 
 ## FW
 * Keras 2.0.8
