@@ -56,11 +56,11 @@ def generator(x_train, y_train, num_batch):
 
 def test_generator(x_test, y_test, num_batch):
     N = x_train.shape[0]
-	while True:
-		ridxes = np.random.permutation(N)
-		for i in range(0, N-num_batch+1, num_batch):
-			idxes = ridxes[i:i+num_batch if i+num_batch < N else N]
-			yield np.array(loadImagesX(x_train[idxes])), np.array(loadImagesY(y_train[idxes]))
+    while True:
+        ridxes = np.random.permutation(N)
+        for i in range(0, N-num_batch+1, num_batch):
+            idxes = ridxes[i:i+num_batch if i+num_batch < N else N]
+            yield np.array(loadImagesX(x_train[idxes])), np.array(loadImagesY(y_train[idxes]))
 
 def loadTrain():
     return loadCSV("data.csv")
