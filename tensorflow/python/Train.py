@@ -24,7 +24,7 @@ x_train, y_train = loadTrain()
 # 定数
 N = x_train.shape[0]
 BASE_IR = 0.001
-BATCH_SIZE = 3
+BATCH_SIZE = 1
 EPOCHS = 2
 epoch_steps = N / BATCH_SIZE
 max_itr = int(epoch_steps * EPOCHS)
@@ -40,9 +40,10 @@ Y = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT*IMAGE_WIDTH, CLASSES])
 y = segnet_basic(X, CLASSES)
 
 # 評価関数
-loss = tf.losses.softmax_cross_entropy(Y, y)
-train_step = tf.train.RMSPropOptimizer(BASE_IR).minimize(loss)
-acc = tf.keras.metrics.categorical_accuracy(Y, y)
+cross_entropy = -tf.reduce_sum(tf.log(y) * Y, axis=1)
+cross_entropy_mean = tf.reduce_mean(cross_entropy)
+train_step = tf.train.RMSPropOptimizer(BASE_IR).minimize(cross_entropy)
+acc = tf.reduce_mean(tf.keras.metrics.categorical_accuracy(Y, y))
 
 with tf.Session() as sess:
     try:
@@ -57,8 +58,8 @@ with tf.Session() as sess:
     try:
         for i in range(max_itr):
             bx, by = gen.__next__()
-            train_loss, step = sess.run([loss, train_step], feed_dict={X: bx, Y: by})
-            print("loss={}".format(train_loss))
+            train_loss, train_acc, step = sess.run([cross_entropy_mean, acc, train_step], feed_dict={X: bx, Y: by})
+            print("loss={:.5f} acc={:.5f}".format(train_loss, train_acc))
 
             i2 = (i % int(epoch_steps))
             if i != 0 and i2 == 0:
