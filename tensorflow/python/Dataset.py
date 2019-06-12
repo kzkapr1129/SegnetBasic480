@@ -2,6 +2,7 @@ import numpy as np
 import csv
 import glob
 import cv2
+from keras.applications import imagenet_utils
 
 IMAGE_HEIGHT = 480
 IMAGE_WIDTH = 480
@@ -20,7 +21,7 @@ def loadCSV(filename):
 def preprocessX(filepath):
     img = cv2.imread(filepath)
     resizedImg = cv2.resize(img, (IMAGE_HEIGHT, IMAGE_WIDTH))
-    return resizedImg.astype(np.float) / 128.0 - 1.0 # [0, 255] -> [-1.0, 1.0)
+    return resizedImg.astype(np.float)
 
 def preprocessY(filepath):
     img = cv2.imread(filepath)
@@ -37,14 +38,14 @@ def loadImagesX(filenames):
     for filename in filenames:
         img = preprocessX(TRAIN_X_BASE_DIR + filename)
         imgs.append(img)
-    return imgs
+    return imagenet_utils.preprocess_input(np.array(imgs))
 
 def loadImagesY(filenames):
     imgs = []
     for filename in filenames:
         img = preprocessY(TRAIN_Y_BASE_DIR + filename)
         imgs.append(img)
-    return imgs
+    return np.array(imgs)
 
 def generator(x_train, y_train, num_batch):
 	N = x_train.shape[0]
@@ -52,7 +53,7 @@ def generator(x_train, y_train, num_batch):
 		ridxes = np.random.permutation(N)
 		for i in range(N-num_batch+1):
 			idxes = ridxes[i:i+num_batch if i+num_batch < N else N]
-			yield np.array(loadImagesX(x_train[idxes])), np.array(loadImagesY(y_train[idxes]))
+			yield loadImagesX(x_train[idxes]), loadImagesY(y_train[idxes])
 
 def test_generator(x_test, y_test, num_batch):
     N = x_train.shape[0]
