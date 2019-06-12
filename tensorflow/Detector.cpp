@@ -180,9 +180,7 @@ bool Detector::predict(const cv::Mat& img, cv::Point& pos, cv::Mat*& output) {
 void Detector::preprocess(const cv::Mat& img) {
     cv::Mat sample;
     if (img.channels() == 1) {
-        cv::cvtColor(img, sample, cv::COLOR_GRAY2RGB);
-    } else if (img.channels() == 3) {
-        cv::cvtColor(img, sample, cv::COLOR_BGR2RGB);
+        cv::cvtColor(img, sample, cv::COLOR_GRAY2BGR);
     } else {
         sample = img;
     }
@@ -200,12 +198,11 @@ void Detector::preprocess(const cv::Mat& img) {
 
     if (mMean.size() != cv::Size(INPUT_IMG_WIDTH, INPUT_IMG_HEIGHT)) {
         mMean = cv::Mat::zeros(INPUT_IMG_HEIGHT, INPUT_IMG_WIDTH, CV_32FC3);
-        mMean = cv::Scalar(128, 128, 128);
+        mMean = cv::Scalar(103.939, 116.779, 123.68);
     }
 
     cv::Mat sample_norm;
     cv::subtract(sample_float, mMean, mInput);
-    mInput *= 0.0078125f;
 }
 
 TF_Buffer* Detector::read_file(const std::string& filename) {
